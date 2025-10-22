@@ -3,3 +3,9 @@ adjust the code so that users can register and login. Also from the chating sect
 
 Nyekachi
 123456
+
+register user
+_on_socket_receive_message
+send_message
+socket_connections
+send_file
