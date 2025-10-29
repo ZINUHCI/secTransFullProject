@@ -5,6 +5,9 @@ from ui.chat_screen import show_chat_screen
 from ui.login_screen import show_login_screen
 from ui.register_screen import show_register_screen
 from utils import clear_window, decryption, encryption, fetch_and_display_history, fetch_users, send_file_msg, login_user, logout_user, on_user_select, register_user, send_text_msg, socket_connection, socket_receive
+from utils.local_db import init_db
+from utils import load_chat_history, save_messages
+from utils import save_file
 
 # Load variables from .env
 load_dotenv()
@@ -31,6 +34,9 @@ class MessengerApp:
         self.sio.on("receive_message", self._on_socket_receive_message)
 
         self.show_login_screen()
+
+        # Intialize SQLiteDB for saving messages in the frontend
+        init_db()
 
     def show_login_screen(self):
         show_login_screen(self)
@@ -90,6 +96,20 @@ class MessengerApp:
         socket_receive._on_socket_receive_message(self, data)
 
 
+    def save_message(self, msg, msg_type, direction):
+        save_messages.save_message(self, msg, msg_type, direction)
+
+    def load_chat_history(self):
+        return load_chat_history.load_chat_history(self)
+
+    def save_file_message(self, file_bytes, filename, direction):
+        return save_file.save_file_message(self, file_bytes, filename, direction)
+    
+    def open_file(self, filepath):
+        send_file_msg.open_file(filepath)
+
+    def _fetch_missed_messages_from_server(self):
+        on_user_select._fetch_missed_messages_from_server(self)
 
 if __name__ == "__main__":
     root = tk.Tk()

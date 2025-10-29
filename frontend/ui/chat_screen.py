@@ -41,8 +41,15 @@ def show_chat_screen(self):
     self.msg_entry.pack(side="left", padx=(0, 5), expand=True, fill="x")
     self.msg_entry.focus()
 
+    # A user hitting enter will send the message
+    self.msg_entry.bind("<Return>", lambda event: self.send_message())
+
     tk.Button(input_frame, text="Send", width=10, command=self.send_message).pack(side="right", padx=5)
     tk.Button(input_frame, text="📁 File", width=10, command=self.send_file).pack(side="right")
+
+    # ✅ Add this layout enhancement here
+    self.root.grid_rowconfigure(1, weight=1)
+    self.root.grid_columnconfigure(0, weight=1)
 
     # Fetch users (in background)
     import threading

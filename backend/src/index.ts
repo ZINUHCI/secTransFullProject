@@ -14,7 +14,7 @@ import { authMiddleware, AuthRequest } from './utils/auth';
 import authRouter from './routes/AuthRoutes' ;
 import pubKeyRouter from "@src/routes/publicKey";
 import viewRouter from "@src/routes/view";
-import msgsRouter from "@src/routes/sendEncryptedRoutes"
+import createMsgsRouter from "@src/routes/sendEncryptedRoutes";
 import { socketAuthMiddleware, socketOnConnection } from './middlewares/socket';
 
 dotenv.config();
@@ -42,7 +42,7 @@ app.use("/pubKey", pubKeyRouter);
 
 app.use("/view", viewRouter)
 
-app.use("/messages", msgsRouter)
+app.use("/messages", createMsgsRouter(io));
 
 io.use(socketAuthMiddleware);
 

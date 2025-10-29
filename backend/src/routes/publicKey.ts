@@ -8,6 +8,7 @@ const router = Router()
 // publish public key
 router.post('/publish-public-key', authMiddleware, async (req: AuthRequest, res) => {
   const { publicKeyPem } = req.body;
+  console.log(req.body);
   if (!publicKeyPem) return res.status(400).json({ message: 'publicKeyPem required' });
   await User.findByIdAndUpdate(req.user!.id, { publicKeyPem });
   return res.status(200).json({ message: 'ok' });

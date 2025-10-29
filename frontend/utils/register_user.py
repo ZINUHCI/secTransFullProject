@@ -25,16 +25,10 @@ def register_user(self):
 
             # 🔑 Generate RSA key pair on successful register
             key = RSA.generate(2048)
+            print(key)
             self.private_key = key.export_key()
             self.public_key = key.publickey().export_key()
-
-            # Send public key to backend for storage
-            headers = {"Authorization": f"Bearer {self.token}"}
-            payload = {"publicKeyPem": self.public_key.decode()}
-            res2 = requests.post(f"{SERVER_URL}/pubKey/publish-public-key", json=payload, headers=headers)
-            if res2.status_code != 200:
-                messagebox.showerror("Unable to publish public key", res2.json().get("message", "Invalid credentials"))
-                return
+            print(f"Public key at register: {self.public_key}")
 
 
             self.show_login_screen()

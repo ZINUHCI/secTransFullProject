@@ -12,7 +12,7 @@ export interface IMessage extends Document {
   filepath?: string | null;
   delivered: boolean;
   createdAt: Date;
-  tag?: Buffer;
+  tag: Buffer;
 }
 
 const MessageSchema = new Schema<IMessage>(

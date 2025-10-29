@@ -9,6 +9,7 @@ SERVER_URL = os.getenv("SERVER_URL")
 def connect_socket(self):
         """Connect to the backend Socket.IO server."""
         try:
+            print(self.token)
             self.sio.connect(SERVER_URL, transports=["websocket"], auth={"token": self.token})
             print("✅ Socket connected")
 

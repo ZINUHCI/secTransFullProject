@@ -1,52 +1,118 @@
-import requests, tempfile, os
-from tkinter import messagebox, END
+import sqlite3
+from tkinter import END
+import os
 from dotenv import load_dotenv
 
-# Load variables from .env
+# Load environment variables (for DB file path)
 load_dotenv()
-
-SERVER_URL = os.getenv("SERVER_URL")
-
+DB_FILE = os.getenv("DB_FILE")
 
 def fetch_and_display_history(self, other_username):
     """
-    Assumes backend endpoint:
-        GET /messages/history/:otherUsername
-    returns list of messages relevant to current user and that user in ascending order.
-    Each message must include:
-        { sender, recipient, encryptedAesKeyB64, nonceB64, ciphertextB64, tagB64, type, filename?, createdAt }
+    Fetch chat history between self.username and other_username,
+    and display it in the chat box.
     """
-    try:
-        headers = {"Authorization": f"Bearer {self.token}"}
-        res = requests.get(f"{SERVER_URL}/messages/history/{other_username}", headers=headers)
-        if res.status_code != 200:
-            messagebox.showerror("Error", res.json().get("message", "Could not load history"))
-            return
 
-        msgs = res.json().get("messages", [])
-        for m in msgs:
-            try:
-                plaintext = self.decrypt_message_payload(m)
-                # display depending on type
-                self.chat_box.config(state="normal")
-                ts = m.get("createdAt", "")
-                if m.get("type") == "file":
-                    # save file to temp and provide path
-                    filename = m.get("filename") or "file"
-                    tmp = tempfile.NamedTemporaryFile(delete=False, prefix="recv_", suffix="_"+filename)
-                    tmp.write(plaintext)
-                    tmp.close()
-                    self.chat_box.insert(END, f"{m['sender']} → You: [file] {filename} saved to {tmp.name}\n")
+    if not DB_FILE or not os.path.exists(DB_FILE):
+        print("⚠️ No local chat database found.")
+        return
+
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+
+        # Get all messages where sender/receiver are self.username and other_username
+        cursor.execute("""
+            SELECT sender, message, direction, timestamp, type, filename, filepath
+            FROM messages
+            WHERE owner = ? AND ((sender=? AND receiver=?) OR (sender=? AND receiver=?))
+            ORDER BY timestamp ASC
+        """, (self.username, self.username, other_username, other_username, self.username))
+
+        rows = cursor.fetchall()
+        conn.close()
+
+        # Now display them in the chat box
+        self.chat_box.config(state="normal")
+        self.chat_box.delete("1.0", END)
+        self.chat_box.insert(END, f"📩 Chatting with {other_username}\n\n")
+
+        for row in rows:
+            print(row)
+            sender, message, direction, timestamp, msg_type, filename, filepath = row
+
+            if msg_type == "file":
+                # File messages
+                if sender == self.username:
+
+
+                     # Display clickable filename in chat
+                    self.chat_box.config(state="normal")
+
+                    # Insert the initial text
+                    self.chat_box.insert(END, "📤 You sent ")
+
+                    # Capture the position before inserting filename
+                    start_index = self.chat_box.index("end-1c")
+                    self.chat_box.insert(END, filename)
+                    end_index = self.chat_box.index("end-1c")
+
+                    # Add clickable tag
+                    tag_name = f"file_{filename}"
+                    self.chat_box.tag_add(tag_name, start_index, end_index)
+                    self.chat_box.tag_config(tag_name, foreground="blue", underline=True)
+                    self.chat_box.tag_bind(tag_name, "<Button-1>", lambda e, p=filepath: self.open_file(p))
+
+                    # Make text hoverable
+                    self.chat_box.tag_bind(tag_name, "<Enter>", lambda e: self.chat_box.config(cursor="hand2"))
+                    self.chat_box.tag_bind(tag_name, "<Leave>", lambda e: self.chat_box.config(cursor=""))
+
+                    # Continue text
+                    self.chat_box.insert(END, f" to {self.selected_user}\n")
+                    self.chat_box.config(state="disabled")
+                    self.chat_box.update_idletasks()
+
+
                 else:
-                    # treat as text
-                    text = plaintext.decode("utf-8", errors="replace")
-                    self.chat_box.insert(END, f"{m['sender']} ({ts}): {text}\n")
-                self.chat_box.config(state="disabled")
-            except Exception as de:
-                # decryption failed for this message
-                print("Decryption error for message:", de)
-                self.chat_box.config(state="normal")
-                self.chat_box.insert(END, f"{m['sender']}: [unable to decrypt]\n")
-                self.chat_box.config(state="disabled")
+
+
+
+                     # Display clickable filename in chat
+                    self.chat_box.config(state="normal")
+
+                    # Insert the initial text
+                    self.chat_box.insert(END, "📤 You received ")
+
+                    # Capture the position before inserting filename
+                    start_index = self.chat_box.index("end-1c")
+                    self.chat_box.insert(END, filename)
+                    end_index = self.chat_box.index("end-1c")
+
+                    # Add clickable tag
+                    tag_name = f"file_{filename}"
+                    self.chat_box.tag_add(tag_name, start_index, end_index)
+                    self.chat_box.tag_config(tag_name, foreground="blue", underline=True)
+                    self.chat_box.tag_bind(tag_name, "<Button-1>", lambda e, p=filepath: self.open_file(p))
+
+                    # Make text hoverable
+                    self.chat_box.tag_bind(tag_name, "<Enter>", lambda e: self.chat_box.config(cursor="hand2"))
+                    self.chat_box.tag_bind(tag_name, "<Leave>", lambda e: self.chat_box.config(cursor=""))
+
+                    # Continue text
+                    self.chat_box.insert(END, f" from {self.selected_user}\n")
+                    self.chat_box.config(state="disabled")
+                    self.chat_box.update_idletasks()
+
+
+
+            else:
+                # Text messages
+                if sender == self.username:
+                    self.chat_box.insert(END, f"You: {message}\n")
+                else:
+                    self.chat_box.insert(END, f"{sender}: {message}\n")
+
+        self.chat_box.config(state="disabled")
+
     except Exception as e:
-        messagebox.showerror("Error", f"Could not fetch history.\n{e}")
+        print(f"⚠️ Error loading chat history: {e}")

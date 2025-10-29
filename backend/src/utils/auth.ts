@@ -14,7 +14,8 @@ user?: { id: string; username: string };
 
 export function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
 try {
-const auth = req.headers.authorization;
+    const auth = req.headers.authorization;
+    console.log(auth)
 if (!auth) return res.status(401).json({ message: 'Missing Authorization header' });
 const token = auth.split(' ')[1];
 const payload = jwt.verify(token, JWT_SECRET) as { id: string; username: string };
