@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import scrolledtext, END, Listbox
 
 def show_chat_screen(self):
+
     self.clear_window()
 
     # Header

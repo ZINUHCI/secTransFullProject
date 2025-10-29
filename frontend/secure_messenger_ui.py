@@ -8,6 +8,7 @@ from utils import clear_window, decryption, encryption, fetch_and_display_histor
 from utils.local_db import init_db
 from utils import load_chat_history, save_messages
 from utils import save_file
+from utils.save_logged_in_user import save_user_token
 
 # Load variables from .env
 load_dotenv()
@@ -37,6 +38,16 @@ class MessengerApp:
 
         # Intialize SQLiteDB for saving messages in the frontend
         init_db()
+
+
+        user = self.get_logged_in_user()
+
+        if user:
+            self.username, self.token = user
+            self.show_chat_screen()
+        else:
+            self.show_login_screen()
+
 
     def show_login_screen(self):
         show_login_screen(self)
@@ -95,7 +106,6 @@ class MessengerApp:
     def _on_socket_receive_message(self, data):
         socket_receive._on_socket_receive_message(self, data)
 
-
     def save_message(self, msg, msg_type, direction):
         save_messages.save_message(self, msg, msg_type, direction)
 
@@ -110,6 +120,14 @@ class MessengerApp:
 
     def _fetch_missed_messages_from_server(self):
         on_user_select._fetch_missed_messages_from_server(self)
+
+    def get_logged_in_user(self):
+        from utils.local_db import get_logged_in_user
+        return get_logged_in_user()
+
+    def save_logged_in_user(self):
+        save_user_token(self)
+
 
 if __name__ == "__main__":
     root = tk.Tk()

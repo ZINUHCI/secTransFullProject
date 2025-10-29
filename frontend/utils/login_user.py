@@ -28,6 +28,7 @@ def login_user(self):
             print(data)
             self.username = username
             self.token = data["token"]
+            self.save_logged_in_user()
 
             # 🔑 Generate RSA key pair on successful register
             key = RSA.generate(2048)

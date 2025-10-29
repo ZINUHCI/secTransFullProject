@@ -7,6 +7,7 @@ load_dotenv()
 SERVER_URL = os.getenv("SERVER_URL")
 
 def fetch_users(self):
+    print(self.token)
     try:
         headers = {"Authorization": f"Bearer {self.token}"}
         res = requests.get(f"{SERVER_URL}/view/users", headers=headers, timeout=5)

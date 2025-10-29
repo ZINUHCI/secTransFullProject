@@ -113,42 +113,48 @@ export default function msgsRouter(io: Server) {
    * FETCH UNDELIVERED (MISSED) MESSAGES
    * ===============================
    */
-  router.get("/missed", authMiddleware, async (req: AuthRequest, res) => {
-    try {
-      const username = req.user!.username;
+router.get("/missed/:sender", authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const username = req.user!.username;
+    const sender = req.params.sender;
 
-      // Find messages that were sent TO this user but not yet delivered
-      const missed = await Message.find({
-        recipient: username,
-        delivered: false
-      }).sort({ timestamp: 1 });
+    console.log(`Fetching missed messages for user: ${username} from sender: ${sender}`);
 
-      // Mark them as delivered immediately (to prevent resend on next call)
-      await Message.updateMany(
-        { recipient: username, delivered: false },
-        { $set: { delivered: true } }
-      );
+    // Find messages sent TO this user by the specified sender that haven’t been delivered yet
+    const missed = await Message.find({
+      recipient: username,
+      sender: sender,
+      delivered: false
+    }).sort({ createdAt: 1 }); // ✅ use createdAt instead of timestamp
 
-      // Prepare response with Base64 fields for client-side decryption
-      const formatted = missed.map(m => ({
-        id: m._id,
-        from: m.sender,
-        encryptedAesKeyB64: m.encryptedAesKey.toString("base64"),
-        nonceB64: m.nonce.toString("base64"),
-        ciphertextB64: m.ciphertext.toString("base64"),
-        tagB64: m.tag.toString("base64"),
-        type: m.type,
-        filename: m.filename,
-        filesize: m.filesize,
-        timestamp: m.createdAt,
-      }));
+    // Mark them as delivered immediately (to prevent resend on next call)
+    await Message.updateMany(
+      { recipient: username, sender: sender, delivered: false },
+      { $set: { delivered: true } }
+    );
 
-      return res.status(200).json({ missed: formatted });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Server error" });
-    }
-  });
+    // Prepare response with Base64 fields for client-side decryption
+    const formatted = missed.map(m => ({
+      id: m._id,
+      from: m.sender,
+      encryptedAesKeyB64: m.encryptedAesKey.toString("base64"),
+      nonceB64: m.nonce.toString("base64"),
+      ciphertextB64: m.ciphertext.toString("base64"),
+      tagB64: m.tag.toString("base64"),
+      type: m.type,
+      filename: m.filename,
+      filesize: m.filesize,
+      timestamp: m.createdAt, // ✅ correctly mapped
+    }));
+
+    console.log(`User ${username} fetched ${formatted.length} missed messages from ${sender}.`);
+
+    return res.status(200).json({ missed_messages: formatted });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 

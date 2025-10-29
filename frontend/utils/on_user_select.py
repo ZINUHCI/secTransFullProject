@@ -39,8 +39,8 @@ def _fetch_missed_messages_from_server(self):
         if res.status_code != 200:
             print("No new messages or failed to sync.")
             return
-
-        new_msgs = res.json().get("messages", [])
+        print(res.json())
+        new_msgs = res.json().get("missed_messages", [])
         if not new_msgs:
             print("No new messages from server.")
             return
