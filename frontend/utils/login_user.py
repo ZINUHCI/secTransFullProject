@@ -28,12 +28,15 @@ def login_user(self):
             print(data)
             self.username = username
             self.token = data["token"]
-            self.save_logged_in_user()
 
             # 🔑 Generate RSA key pair on successful register
             key = RSA.generate(2048)
             self.private_key = key.export_key()
             self.public_key = key.publickey().export_key()
+
+            # Save logged-in user session locally
+            self.save_logged_in_user()
+
             print(f"Public key at register: {self.public_key}")
 
              # Send public key to backend for storage

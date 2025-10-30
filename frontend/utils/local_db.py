@@ -29,31 +29,17 @@ def init_db():
         )
     """)
 
-    # Table for storing the logged-in user's data and JWT token
+    # Table for storing the logged-in user's data, JWT, and private key
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS user_session (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             jwt_token TEXT,
+            private_key TEXT,  -- Store the user’s private key here
             logged_in BOOLEAN DEFAULT 0,
             last_login DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
-
-    conn.commit()
-    conn.close()
-
-
-# Save user session (store or update JWT)
-def save_user_session(username, jwt_token):
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        INSERT INTO user_session (username, jwt_token, logged_in)
-        VALUES (?, ?, 1)
-        ON CONFLICT(username) DO UPDATE SET jwt_token=excluded.jwt_token, logged_in=1
-    """, (username, jwt_token))
 
     conn.commit()
     conn.close()
@@ -64,10 +50,9 @@ def get_logged_in_user():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT username, jwt_token FROM user_session WHERE logged_in=1 LIMIT 1")
+    cursor.execute("SELECT username, jwt_token, private_key FROM user_session WHERE logged_in=1 LIMIT 1")
     user = cursor.fetchone()
 
     conn.close()
     print(user)
-    return user  # returns (username, jwt_token) or None
-
+    return user  # returns (username, jwt_token, private_key) or None

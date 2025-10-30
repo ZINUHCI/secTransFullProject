@@ -20,7 +20,7 @@ import { socketAuthMiddleware, socketOnConnection } from './middlewares/socket';
 dotenv.config();
 
 const MONGO = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/secure_messenger';
-const PORT = Number(process.env.PORT || 5000);
+const PORT = Number(process.env.PORT || 4000);
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
 
 // connect mongo

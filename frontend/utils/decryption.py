@@ -53,4 +53,4 @@ def decrypt_message_payload(self, msg_obj):
 
     except Exception as e:
         print("Decryption error:", e)
-        raise Exception(f"Message decryption failed: {e}")
+        return f"Message decryption failed: {e}"

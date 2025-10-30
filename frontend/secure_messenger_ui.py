@@ -8,7 +8,7 @@ from utils import clear_window, decryption, encryption, fetch_and_display_histor
 from utils.local_db import init_db
 from utils import load_chat_history, save_messages
 from utils import save_file
-from utils.save_logged_in_user import save_user_token
+from utils.save_logged_in_user import save_user_session
 
 # Load variables from .env
 load_dotenv()
@@ -43,7 +43,7 @@ class MessengerApp:
         user = self.get_logged_in_user()
 
         if user:
-            self.username, self.token = user
+            self.username, self.token, self.private_key = user
             self.show_chat_screen()
         else:
             self.show_login_screen()
@@ -126,7 +126,7 @@ class MessengerApp:
         return get_logged_in_user()
 
     def save_logged_in_user(self):
-        save_user_token(self)
+        save_user_session(self)
 
 
 if __name__ == "__main__":
