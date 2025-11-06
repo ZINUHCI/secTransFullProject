@@ -2,10 +2,8 @@ import { Router } from "express";
 import { Server } from "socket.io";
 import { User } from "@src/models/User";
 import { Message } from "@src/models/Message";
-import { authMiddleware, AuthRequest } from "@src/utils/auth";
+import { authMiddleware, AuthRequest } from "@src/middlewares/auth";
 import upload from "@src/utils/multer";
-import fs from "fs";
-import path from "path";
 
 // Instead of exporting a plain router, export a function that takes io
 export default function msgsRouter(io: Server) {

@@ -1,30 +1,28 @@
 import os
-import shutil
 import sqlite3
 from datetime import datetime
 from dotenv import load_dotenv
 
-load_dotenv()
-DB_FILE = os.getenv("DB_FILE")
+# ✅ Make file paths relative to the current script’s directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FILES_DIR = os.path.join(BASE_DIR, "user_data", "files")
 
-FILES_DIR = "user_data/files"
 
 def save_file_message(self, file_bytes, filename, direction):
     """
     Saves the received or sent file locally in FILES_DIR and records metadata in SQLite.
     """
-    os.makedirs(FILES_DIR, exist_ok=True)  # Ensure folder exists
+    os.makedirs(self.file_dir, exist_ok=True)  # Ensure folder exists
 
-    # Generate unique filename to avoid collisions
     safe_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
-    filepath = os.path.join(FILES_DIR, safe_filename)
+    filepath = os.path.join(self.file_dir, safe_filename)
 
-    # ✅ Save actual file
+    # ✅ Save the file
     with open(filepath, "wb") as f:
         f.write(file_bytes)
 
     # ✅ Save metadata in SQLite
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(self.db_path)
     cursor = conn.cursor()
 
     cursor.execute("""

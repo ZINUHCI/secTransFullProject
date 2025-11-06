@@ -1,15 +1,14 @@
-import express from "express";
+
+
 import { Server, Socket, ExtendedError } from "socket.io";
-import dotenv from "dotenv";
 import { User } from "@src/models/User";
 import jwt from "jsonwebtoken";
 import { Message } from "@src/models/Message";
 
-dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
+console.log("JWT_SECRET from socket 1st", JWT_SECRET);
 
-const app = express();
 
 // ---------- socket.io auth middleware ----------
 
@@ -17,6 +16,8 @@ export const socketAuthMiddleware = (socket: Socket, next:(err?: ExtendedError |
   try {
     const token = socket.handshake.auth?.token as string | undefined;
     if (!token) return next(new Error('Authentication error: token missing'));
+    console.log("JWT_SECRET from socket", JWT_SECRET);
+    
     const payload = jwt.verify(token, JWT_SECRET) as { id: string; username: string };
     (socket as any).user = payload;
     next();

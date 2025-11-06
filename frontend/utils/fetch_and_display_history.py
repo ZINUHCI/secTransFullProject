@@ -3,16 +3,15 @@ from tkinter import END
 import os
 from dotenv import load_dotenv
 
-# Load environment variables (for DB file path)
-load_dotenv()
-DB_FILE = os.getenv("DB_FILE")
-
 
 def fetch_and_display_history(self, other_username):
     """
     Fetch chat history between self.username and other_username,
     and display it neatly in the chat box.
     """
+
+    SERVER_URL = self.server_url
+    DB_FILE = self.db_path
 
     if not DB_FILE or not os.path.exists(DB_FILE):
         print("⚠️ No local chat database found.")

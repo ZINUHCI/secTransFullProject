@@ -3,11 +3,6 @@ from tkinter import END, messagebox
 import requests
 import os
 from datetime import datetime
-from dotenv import load_dotenv
-
-load_dotenv()
-
-SERVER_URL = os.getenv("SERVER_URL")
 
 def on_user_select(self, event):
     """Handles user selection in chat list and loads conversation (local + online sync)."""
@@ -35,7 +30,7 @@ def _fetch_missed_messages_from_server(self):
     try:
         headers = {"Authorization": f"Bearer {self.token}"}
 
-        res = requests.get(f"{SERVER_URL}/messages/missed/{self.selected_user}", headers=headers, timeout=10)
+        res = requests.get(f"{self.server_url}/messages/missed/{self.selected_user}", headers=headers, timeout=10)
         if res.status_code != 200:
             print("No new messages or failed to sync.")
             return

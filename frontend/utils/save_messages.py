@@ -3,12 +3,6 @@ import sqlite3
 import os
 from dotenv import load_dotenv
 
-
-# Load variables from .env
-load_dotenv()
-
-DB_FILE = os.getenv("DB_FILE")
-
 # -------------------------------
 # Save message to local database
 # -------------------------------
@@ -18,7 +12,7 @@ def save_message(self, message, type, direction):
         print("⚠️ Cannot save message: username or selected_user missing.")
         return
 
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(self.db_path)
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO messages (owner, sender, receiver, message, direction, type)

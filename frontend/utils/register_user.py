@@ -3,12 +3,6 @@ import requests, os
 from dotenv import load_dotenv
 from Crypto.PublicKey import RSA
 
-
-# Load variables from .env
-load_dotenv()
-
-SERVER_URL = os.getenv("SERVER_URL")
-
    # -----------------------------
     # REGISTER FUNCTION
     # -----------------------------
@@ -19,7 +13,7 @@ def register_user(self):
         messagebox.showwarning("Input Error", "All fields are required.")
         return
     try:
-        res = requests.post(f"{SERVER_URL}/auth/register", json={"username": username, "password": password})
+        res = requests.post(f"{self.server_url}/auth/register", json={"username": username, "password": password})
         if res.status_code == 200:
             messagebox.showinfo("Success", "Registration successful! You can now log in.")
 

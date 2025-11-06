@@ -3,11 +3,6 @@ import os
 from dotenv import load_dotenv
 
 
-# Load variables from .env
-load_dotenv()
-
-DB_FILE = os.getenv("DB_FILE")
-
 # -------------------------------
 # Load chat history
 # -------------------------------
@@ -16,8 +11,8 @@ def load_chat_history(self):
     if not self.username or not self.selected_user:
         print("⚠️ Cannot load chat: username or selected_user missing.")
         return []
-
-    conn = sqlite3.connect(DB_FILE)
+    
+    conn = sqlite3.connect(self.db_path)
     cursor = conn.cursor()
     cursor.execute("""
         SELECT sender, message, direction, timestamp

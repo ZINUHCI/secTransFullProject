@@ -5,9 +5,6 @@ from dotenv import load_dotenv
 import platform
 import subprocess
 
-# Load variables from .env
-load_dotenv()
-SERVER_URL = os.getenv("SERVER_URL")
 
 # -----------------------------
 # SEND FILE MESSAGE
@@ -81,7 +78,7 @@ def send_file(self):
 
         # Try to send online
         try:
-            res = requests.post(f"{SERVER_URL}/messages/send-file", files=files, data=data, headers=headers, timeout=10)
+            res = requests.post(f"{self.server_url}/messages/send-file", files=files, data=data, headers=headers, timeout=10)
             print("place 1")
             if res.status_code != 200:
                 messagebox.showerror("Send Error", res.json().get("message", "Failed to send file"))

@@ -1,16 +1,9 @@
 # local_db.py
 import sqlite3
-import os
-from dotenv import load_dotenv
-
-# Load variables from .env
-load_dotenv()
-
-DB_FILE = os.getenv("DB_FILE")
 
 # Ensure the database exists and the tables are created
-def init_db():
-    conn = sqlite3.connect(DB_FILE)
+def init_db(self):
+    conn = sqlite3.connect(self.db_path)
     cursor = conn.cursor()
 
     # Table for storing messages (per user)
@@ -46,8 +39,8 @@ def init_db():
 
 
 # Fetch the currently logged-in user (if any)
-def get_logged_in_user():
-    conn = sqlite3.connect(DB_FILE)
+def get_logged_in_user(self):
+    conn = sqlite3.connect(self.db_path)
     cursor = conn.cursor()
 
     cursor.execute("SELECT username, jwt_token, private_key FROM user_session WHERE logged_in=1 LIMIT 1")

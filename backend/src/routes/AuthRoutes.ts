@@ -1,10 +1,12 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+
 import { Router } from "express"
 import { User } from "@src/models/User";
 import bcrypt from 'bcryptjs';
-import dotenv from "dotenv";
 import jwt from 'jsonwebtoken';
 
-dotenv.config();
 
 const router = Router()
 const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
@@ -29,6 +31,8 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
+    console.log("JWT Secret", JWT_SECRET);
+    
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ message: 'Missing fields' });
     const user = await User.findOne({ username });

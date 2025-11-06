@@ -2,15 +2,13 @@ from tkinter import messagebox, END
 import requests, os, threading
 from dotenv import load_dotenv
 
-# Load variables from .env
-load_dotenv()
-SERVER_URL = os.getenv("SERVER_URL")
+
 
 def fetch_users(self):
     print(self.token)
     try:
         headers = {"Authorization": f"Bearer {self.token}"}
-        res = requests.get(f"{SERVER_URL}/view/users", headers=headers, timeout=5)
+        res = requests.get(f"{self.server_url}/view/users", headers=headers, timeout=5)
 
         if res.status_code == 200:
             self.users = res.json().get("users", [])

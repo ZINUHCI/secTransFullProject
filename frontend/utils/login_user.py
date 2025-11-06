@@ -4,12 +4,6 @@ from dotenv import load_dotenv
 from Crypto.PublicKey import RSA
 
 
-# Load variables from .env
-load_dotenv()
-
-SERVER_URL = os.getenv("SERVER_URL")
-
-
 # -----------------------------
 # LOGIN FUNCTION
 # -----------------------------
@@ -21,7 +15,7 @@ def login_user(self):
         messagebox.showwarning("Input Error", "All fields are required.")
         return
     try:
-        res = requests.post(f"{SERVER_URL}/auth/login", json={"username": username, "password": password})
+        res = requests.post(f"{self.server_url}/auth/login", json={"username": username, "password": password})
         if res.status_code == 200:
             print("Login successful")
             data = res.json()
@@ -42,7 +36,7 @@ def login_user(self):
              # Send public key to backend for storage
             headers = {"Authorization": f"Bearer {self.token}"}
             payload = {"publicKeyPem": self.public_key.decode()}
-            res2 = requests.post(f"{SERVER_URL}/pubKey/publish-public-key", json=payload, headers=headers)
+            res2 = requests.post(f"{self.server_url}/pubKey/publish-public-key", json=payload, headers=headers)
             if res2.status_code != 200:
                 messagebox.showerror("Unable to publish public key", res2.json().get("message", "Invalid credentials"))
                 return

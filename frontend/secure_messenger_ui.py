@@ -5,18 +5,14 @@ from ui.chat_screen import show_chat_screen
 from ui.login_screen import show_login_screen
 from ui.register_screen import show_register_screen
 from utils import clear_window, decryption, encryption, fetch_and_display_history, fetch_users, send_file_msg, login_user, logout_user, on_user_select, register_user, send_text_msg, socket_connection, socket_receive
-from utils.local_db import init_db
 from utils import load_chat_history, save_messages
 from utils import save_file
 from utils.save_logged_in_user import save_user_session
 
-# Load variables from .env
-load_dotenv()
-
-SERVER_URL = os.getenv("SERVER_URL")
 
 class MessengerApp:
     def __init__(self, root):
+        
         self.root = root
         self.root.title("🔐 Secure Messenger")
         self.root.geometry("550x550")
@@ -29,6 +25,8 @@ class MessengerApp:
         self.selected_user = None
         self.users = []
 
+        # Load environment variables and setup
+        self.set_up_environment()
         
         # SocketIO client
         self.sio = socketio.Client()
@@ -37,7 +35,7 @@ class MessengerApp:
         self.show_login_screen()
 
         # Intialize SQLiteDB for saving messages in the frontend
-        init_db()
+        self.init_db()
 
 
         user = self.get_logged_in_user()
@@ -123,11 +121,23 @@ class MessengerApp:
 
     def get_logged_in_user(self):
         from utils.local_db import get_logged_in_user
-        return get_logged_in_user()
+        return get_logged_in_user(self)
 
     def save_logged_in_user(self):
         save_user_session(self)
 
+
+    def get_env(self, key, default=None):
+        """Helper to get environment variables easily."""
+        return os.getenv(key, default)
+    
+    def set_up_environment(self):
+        import setup_env 
+        setup_env.set_up_environment(self)
+
+    def init_db(self):
+        from utils.local_db import init_db
+        init_db(self)
 
 if __name__ == "__main__":
     root = tk.Tk()

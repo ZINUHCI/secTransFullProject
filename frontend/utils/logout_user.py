@@ -3,12 +3,6 @@ from tkinter import messagebox
 from dotenv import load_dotenv
 import sqlite3
 
-# Load variables from .env
-load_dotenv()
-
-SERVER_URL = os.getenv("SERVER_URL")
-DB_FILE = os.getenv("DB_FILE")
-
 
     # -----------------------------
     # LOGOUT
@@ -18,7 +12,7 @@ def logout_user(self):
     if confirm:
         try:
             headers = {"Authorization": f"Bearer {self.token}"}
-            requests.post(f"{SERVER_URL}/logout", headers=headers)
+            requests.post(f"{self.server_url}/logout", headers=headers)
         except:
             pass
         try:
@@ -26,7 +20,7 @@ def logout_user(self):
                 self.sio.disconnect()
 
                 # Erase JWT from Local SQLite file
-                conn = sqlite3.connect(DB_FILE)
+                conn = sqlite3.connect(self.db_path)
                 cursor = conn.cursor()
 
                 cursor.execute("UPDATE user_session SET logged_in=0, jwt_token=NULL WHERE username=?", (self.username,))

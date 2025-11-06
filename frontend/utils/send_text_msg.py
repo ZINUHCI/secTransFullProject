@@ -1,9 +1,6 @@
 import requests, os, threading
 from tkinter import messagebox, END
-from dotenv import load_dotenv
 
-load_dotenv()
-SERVER_URL = os.getenv("SERVER_URL")
 
 def send_message(self):
     msg = self.msg_entry.get().strip()
@@ -29,7 +26,7 @@ def _send_message_task(self, msg):
         payload = {"recipient": self.selected_user, **enc}
         headers = {"Authorization": f"Bearer {self.token}"}
 
-        res = requests.post(f"{SERVER_URL}/messages/send-text", json=payload, headers=headers, timeout=5)
+        res = requests.post(f"{self.server_url}/messages/send-text", json=payload, headers=headers, timeout=5)
 
         if res.status_code != 200:
             messagebox.showerror("Error", res.json().get("message", "Failed to send message"))
